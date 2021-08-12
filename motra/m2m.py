@@ -42,21 +42,6 @@ class EObjectProxy(object):
         return wrapped.__str__()
 
 
-def objects(resource):
-    for elt in resource.contents:
-        yield elt
-        yield from elt.eAllContents()
-
-
-def objects_of_kind(resource, type):
-    for elt in resource.contents:
-        if isinstance(elt, type):
-            yield elt
-        for x in elt.eAllContents():
-            if isinstance(x, type):
-                yield x
-
-
 class Parameters(object):
     def __init__(self, transformation, parameter_names):
         self.transformation = transformation
@@ -66,12 +51,6 @@ class Parameters(object):
         if type(item) is str:
             return getattr(self, item)
         return getattr(self, self.parameter_names[item])
-
-
-def load_model(model_path, resource_set=None):
-    rset = resource_set if resource_set else ResourceSet()
-    resource = rset.get_resource(model_path)
-    return resource
 
 
 class Transformation(object):
