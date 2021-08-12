@@ -112,6 +112,7 @@ polymorphic = m2m.Transformation('polymorphic',
 def main(ecore_model):
     for element in ecore_model.contents[0].eAllContents():
         poly_name(element)
+    non_poly(ecore_model.contents[0])
 
 
 @polymorphic.mapping
@@ -121,3 +122,8 @@ def poly_name(self: ecore.EClass):
 @polymorphic.mapping
 def poly_name(self: ecore.EReference):
     self.name = self.name + '_EREFERENCE'
+
+
+@polymorphic.mapping
+def non_poly(self: ecore.EPackage):
+    self.name = self.name + '_non_polymorphic'
