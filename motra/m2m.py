@@ -151,7 +151,7 @@ class Transformation(object):
                         func = pfunc
                         break
                 else:
-                    raise NameError(f"name {f.__name__} is not defined, but cannot happend")
+                    return
             if func.inout:
                 index = func.__code__.co_varnames.index(self_var_name)
                 result = kwargs.get(self_var_name, args[index])

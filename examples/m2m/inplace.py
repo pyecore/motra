@@ -79,3 +79,45 @@ def duppackage(self: ecore.EPackage) -> ecore.EPackage:
 @duplicate.disjunct(mappings=[dupclass, duppackage])
 def dup(self: ecore.EModelElement) -> ecore.EModelElement:
     ...
+
+
+##
+# Fourth simple in-place parametrable transformation, for cache feature
+##
+cache = m2m.Transformation('cache',
+                           inputs=['ecore_model'],
+                           outputs=['ecore_model'])
+
+
+@cache.main
+def main(ecore_model):
+    change_name_package(ecore_model.contents[0])
+    change_name_package(ecore_model.contents[0])
+
+
+@cache.mapping
+def change_name_package(self: ecore.EPackage):
+    self.name = self.name + '_change'
+
+
+##
+# Fifth simple in-place parametrable transformation, demonstrating polymorphism
+##
+polymorphic = m2m.Transformation('polymorphic',
+                                 inputs=['ecore_model'],
+                                 outputs=['ecore_model'])
+
+
+@polymorphic.main
+def main(ecore_model):
+    for element in ecore_model.contents[0].eAllContents():
+        poly_name(element)
+
+
+@polymorphic.mapping
+def poly_name(self: ecore.EClass):
+    self.name = self.name + '_ECLASS'
+
+@polymorphic.mapping
+def poly_name(self: ecore.EReference):
+    self.name = self.name + '_EREFERENCE'
