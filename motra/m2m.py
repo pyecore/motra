@@ -213,6 +213,7 @@ class Transformation(object):
                 if when(*args, **kwargs):
                     return inner(*args, **kwargs)
             when_inner.cache = cached_fun
+            self._polymorphic_calls[(f.__name__, f.self_eclass)] = f
             return when_inner
         self._polymorphic_calls[(f.__name__, f.self_eclass)] = f
         return cached_fun
