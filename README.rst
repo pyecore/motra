@@ -21,12 +21,14 @@ Documentation
 =============
 
 WIP, at the moment, please refer to transformations examples in ``examples``.
+To avoid the need to load/install special metamodels, all the transformations examples are given directly over Ecore.
+The transformations are gathered in simple modules depending to their characteristics: in-place, in-out, endogenous or exogenous.
 
 
 M2M Quick start
 ===============
 
-Each transformation must be defined in it's own Python module:
+Each transformation must be defined in it's own Python module (even if multiple transformations can be defined in one module).
 
 .. code-block:: python
 
