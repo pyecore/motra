@@ -213,9 +213,13 @@ class Transformation(object):
                 if when(*args, **kwargs):
                     return inner(*args, **kwargs)
             when_inner.cache = cached_fun
-            self._polymorphic_calls[(f.__name__, f.self_eclass)] = f
+            existing_mappings = (x.__name__ for x in self.registed_mapping)
+            if f.__name__ in existing_mappings is not None:
+                self._polymorphic_calls[(f.__name__, f.self_eclass)] = f
             return when_inner
-        self._polymorphic_calls[(f.__name__, f.self_eclass)] = f
+        existing_mappings = (x.__name__ for x in self.registed_mapping)
+        if f.__name__ in existing_mappings is not None:
+            self._polymorphic_calls[(f.__name__, f.self_eclass)] = f
         return cached_fun
 
     def disjunct(self, f=None, mappings=None):
