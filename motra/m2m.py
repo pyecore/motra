@@ -61,6 +61,7 @@ class Transformation(object):
         self.metamodels = set()
         self.registed_mapping = []
         self._main = None
+        self._polymorphic_calls = {}
 
     @property
     def inouts(self):
@@ -125,7 +126,6 @@ class Transformation(object):
             return functools.partial(self.mapping,
                                      output_model=output_model,
                                      when=when)
-
         self.registed_mapping.append(f)
         f.__mapping__ = True
         result_var_name = 'result'
@@ -143,13 +143,22 @@ class Transformation(object):
 
         @functools.wraps(f)
         def inner(*args, **kwargs):
-            if f.inout:
-                index = f.__code__.co_varnames.index(self_var_name)
+            try:
+                func = self._polymorphic_calls[(f.__name__, type(args[0]))]
+            except KeyError:
+                for (fname, ftype), pfunc in self._polymorphic_calls.items():
+                    if fname == f.__name__ and isinstance(args[0], ftype):
+                        func = pfunc
+                        break
+                else:
+                    raise NameError(f"name {f.__name__} is not defined, but cannot happend")
+            if func.inout:
+                index = func.__code__.co_varnames.index(self_var_name)
                 result = kwargs.get(self_var_name, args[index])
-            elif f.result_eclass is Ecore.EClass:
-                result = f.result_eclass('')
+            elif func.result_eclass is Ecore.EClass:
+                result = func.result_eclass('')
             else:
-                result = f.result_eclass()
+                result = func.result_eclass()
             inputs = [a for a in args if isinstance(a, Ecore.EObject)]
             # print('CREATE', result, 'FROM', inputs, 'BY', f.__name__)
 
@@ -171,7 +180,7 @@ class Transformation(object):
             rule.records.append(record)
 
             # Inject new parameter
-            g = f.__globals__
+            g = func.__globals__
             marker = object()
             oldvalue = g.get(result_var_name, marker)
             g[result_var_name] = result
@@ -185,16 +194,16 @@ class Transformation(object):
                 if isinstance(value, Ecore.EObject):
                     kwargs[key] = EObjectProxy(value)
             try:
-                f(*new_args, **kwargs)
+                func(*new_args, **kwargs)
             finally:
                 if oldvalue is marker:
                     del g[result_var_name]
                 else:
                     g[result_var_name] = oldvalue
                 # result.listeners.remove(observer)
-                if f.output_def and \
-                        result not in context.outputs[f.output_def].contents:
-                    context.outputs[f.output_def].append(result)
+                if func.output_def and \
+                        result not in context.outputs[func.output_def].contents:
+                    context.outputs[func.output_def].append(result)
             return result
         cached_fun = functools.lru_cache()(inner)
         f.cache = cached_fun
@@ -205,6 +214,7 @@ class Transformation(object):
                     return inner(*args, **kwargs)
             when_inner.cache = cached_fun
             return when_inner
+        self._polymorphic_calls[(f.__name__, f.self_eclass)] = f
         return cached_fun
 
     def disjunct(self, f=None, mappings=None):
