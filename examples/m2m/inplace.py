@@ -73,6 +73,7 @@ def duppackage(self: ecore.EPackage) -> ecore.EPackage:
     result.name = f"{self.name}_duplicate"
     for classifier in list(self.eClassifiers):
         result.eClassifiers.append(dup(classifier))
+        # or: result.eClassifiers += dup(classifier)
 
 
 @duplicate.disjunct(mappings=[dupclass, duppackage])
