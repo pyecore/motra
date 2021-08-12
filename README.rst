@@ -12,6 +12,10 @@ Here are some characteristics about Motra M2M:
 * by default, any object created in a ``mapping`` that is not explicitaly placed in a container is automatically added as model root,
 * used metamodels are automatically registered for smooth load/save of any models.
 
+Todo for Motra M2M:
+
+* add ``mapping`` polymorphism without having to rely on manual coding a dispatch with a ``disjunct``
+
 
 Documentation
 =============
