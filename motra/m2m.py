@@ -104,6 +104,7 @@ class Transformation(object):
             setattr(context.outputs, out_model, resource)
             params[out_model] = resource
         context.primary_output = context.outputs[0]
+        params.update(kwargs)
         self._main(**params)
         if clean_mappings_cache:
             for mapping in self.registed_mapping:
@@ -165,7 +166,7 @@ class Transformation(object):
                 if isinstance(element, Ecore.EObject):
                     record.inputs.append(trace.ObjectReference(old_value=element))
                 else:
-                    record.inputs.append(trace.Attribute(element))
+                    record.inputs.append(trace.Attribute(old_value=element))
             record.outputs.append(trace.ObjectReference(old_value=result))
             rule.records.append(record)
 
@@ -195,14 +196,15 @@ class Transformation(object):
                         result not in context.outputs[f.output_def].contents:
                     context.outputs[f.output_def].append(result)
             return result
+        cached_fun = functools.lru_cache()(inner)
+        f.cache = cached_fun
         if when:
             @functools.wraps(inner)
             def when_inner(*args, **kwargs):
                 if when(*args, **kwargs):
                     return inner(*args, **kwargs)
-                return when_inner
-        cached_fun = functools.lru_cache()(inner)
-        f.cache = cached_fun
+            when_inner.cache = cached_fun
+            return when_inner
         return cached_fun
 
     def disjunct(self, f=None, mappings=None):
