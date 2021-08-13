@@ -1,0 +1,22 @@
+language: python
+python:
+- '3.5'
+- '3.6'
+- '3.7'
+- '3.8'
+- '3.9'
+install:
+- pip install --upgrade pip setuptools
+- pip install --upgrade pytest pytest-cov
+- pip install -e .
+script:
+- python setup.py test -a -v -a --cov=motra
+deploy:
+  provider: pypi
+  user: __token__
+  password:
+    secure: Kwpb09SrBWYDbQY4KMGgdwZM9zIrOde8hPzKLjUDXje3K3AFm4h3dkQzCOqFSG2KIfHcyDpoShx/TmnvNb4r8DxxHEgGwmMGid0oOSsbMk5hkiwwHX11uxfd2hTQ/CI01bVQglyDA0/IG80LZ3AL7T1KPqqB7znUeoRKDvkD9gizogAVNI7vvnWkACQFOSpkh6fCTZoS/Ex8XFpjyuH86nSAaiH0Jmm6bQmmwA3xBHKPim8eRFtDN+Cr1s41IrceiausebkicQ8o52f8gP2M1JebDMMw2I5HSREE+bnVYYYdPFNDdI7ioAgpbrSkIq+3jAXIJ3UH3KBkHQSSycfnuJqNpTRsOI6/N5O93PQTDWYnObQIt6fwKhTPo9MGV8wLd3WzzUbN9mnFV2bcjD9MkBg4wJx9DV6GKGNtIFbDn26ZhCfTl911+kUfz+Zn0gXeqNVOqk9rf8e5MNTw9mZkApYkfldIUfcWSOyhjolHnTWdvkcNeON4X9R3p2YY6kuRxrV+Rk31KRY5FfE4WSYM4xmPg14erUWGmwZdrQ7cG8n4cRQSF4fi40SZYjyKNQ5JF6eqidxsrSlDcPVJcCDoW18lm+PvV8Nrsa+bb/yORcFbJBwJf4KvhVLQeWLE2fDu88g2Ux9HIybg57QXecwOYcDFOQefRoEHEg5yJXnb4Bc=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
+    python: 3.9
