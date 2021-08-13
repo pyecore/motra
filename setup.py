@@ -13,11 +13,11 @@ if sys.version_info < (3, 5):
 setup(
     name='motra',
     version=motra.__version__,
-    description=('A Python(ic) implementation of the UML2 metamodel'),
+    description=('M2M and M2T Models Transformations framework for PyEcore'),
     long_description=open('README.rst').read(),
     long_description_content_type='text/x-rst',
     keywords='model metamodel MDE M2M M2T traceability transformation',
-    url='https://github.com/pyecore/pyuml2',
+    url='https://github.com/pyecore/motra',
     author='Vincent Aranega',
     author_email='vincent.aranega@gmail.com',
 
