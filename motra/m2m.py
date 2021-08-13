@@ -99,7 +99,8 @@ class Transformation(object):
                     setattr(context.outputs, in_model, resource)
                     params[in_model] = resource
             except KeyError as e:
-                raise type(e)(f'{e}:: {in_model} is a missing input model')
+                message = '{}:: {} is a missing input model'.format(e, in_model)
+                raise type(e)(message)
         for out_model in list(set(self.outputs_def) - set(self.inouts)):
             resource = rset.create_resource(URI(out_model))
             setattr(context.outputs, out_model, resource)
