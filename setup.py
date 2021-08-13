@@ -27,7 +27,7 @@ setup(
     tests_require=['pytest'],
     license='BSD 3-Clause',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha'
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
