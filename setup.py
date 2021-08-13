@@ -15,6 +15,7 @@ setup(
     version=motra.__version__,
     description=('A Python(ic) implementation of the UML2 metamodel'),
     long_description=open('README.rst').read(),
+    long_description_content_type='text/x-rst',
     keywords='model metamodel MDE M2M M2T traceability transformation',
     url='https://github.com/pyecore/pyuml2',
     author='Vincent Aranega',
@@ -23,7 +24,7 @@ setup(
     packages=packages,
     package_data={'': ['README.rst', 'LICENSE', 'CHANGELOG.rst']},
     include_package_data=True,
-    install_requires=required_packages,
+    install_requires=['pyecore'],
     tests_require=['pytest'],
     license='BSD 3-Clause',
     classifiers=[

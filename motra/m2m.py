@@ -59,7 +59,7 @@ class Transformation(object):
         self.inputs_def = inputs
         self.outputs_def = outputs
         self.metamodels = set()
-        self.registed_mapping = []
+        self.registered_mappings = []
         self._main = None
         self._polymorphic_calls = {}
 
@@ -108,7 +108,7 @@ class Transformation(object):
         params.update(kwargs)
         self._main(**params)
         if clean_mappings_cache:
-            for mapping in self.registed_mapping:
+            for mapping in self.registered_mappings:
                 mapping.cache.cache_clear()
         return context
 
@@ -126,8 +126,6 @@ class Transformation(object):
             return functools.partial(self.mapping,
                                      output_model=output_model,
                                      when=when)
-
-
         result_var_name = 'result'
         self_var_name = 'self'
         f.self_eclass = typing.get_type_hints(f).get(self_var_name)
@@ -135,12 +133,13 @@ class Transformation(object):
             raise ValueError("Missing 'self' parameter for mapping: '{}'"
                              .format(f.__name__))
 
-        existing_mappings = (x.__name__ for x in self.registed_mapping)
+        existing_mappings = (x.__name__ for x in self.registered_mappings)
         if f.__name__ in existing_mappings:
             self._polymorphic_calls[(f.__name__, f.self_eclass)] = f
 
-        self.registed_mapping.append(f)
+        self.registered_mappings.append(f)
         f.__mapping__ = True
+        f.__transformation__ = self
         self._remember_package(f.self_eclass)
         f.result_eclass = typing.get_type_hints(f).get('return')
         self._remember_package(f.result_eclass)
@@ -220,13 +219,7 @@ class Transformation(object):
                 if when(*args, **kwargs):
                     return inner(*args, **kwargs)
             when_inner.cache = cached_fun
-            # existing_mappings = (x.__name__ for x in self.registed_mapping)
-            # if f.__name__ in existing_mappings:
-            #     self._polymorphic_calls[(f.__name__, f.self_eclass)] = f
             return when_inner
-        # existing_mappings = (x.__name__ for x in self.registed_mapping)
-        # if f.__name__ in existing_mappings:
-        #     self._polymorphic_calls[(f.__name__, f.self_eclass)] = f
         return cached_fun
 
     def disjunct(self, f=None, mappings=None):
