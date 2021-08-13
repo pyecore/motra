@@ -114,7 +114,7 @@ class ObjectReference(Artefact):
             self.new_value = new_value
 
     def __str__(self):
-        return f'old_value: {self.old_value} new_value: {self.new_value}'
+        return 'old_value: {} new_value: {}'.format(self.old_value, self.new_value)
 
 
 class Attribute(Artefact):
@@ -133,4 +133,4 @@ class Attribute(Artefact):
             self.new_value = new_value
 
     def __str__(self):
-        return f'old_value: {self.old_value} new_value: {self.new_value}'
+        return 'old_value: {} new_value: {}'.format(self.old_value, self.new_value)
