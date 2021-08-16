@@ -153,14 +153,20 @@ class Transformation(object):
 
         @functools.wraps(f)
         def inner(*args, **kwargs):
+            index = f.__code__.co_varnames.index(self_var_name)
+            self_parameter = kwargs.get(self_var_name, args[index])
             try:
-                func = self._polymorphic_calls[(f.__name__, type(args[0]))]
+                func = self._polymorphic_calls[(f.__name__, type(self_parameter))]
             except KeyError:
                 for (fname, ftype), pfunc in self._polymorphic_calls.items():
-                    if fname == f.__name__ and isinstance(args[0], ftype):
+                    if fname == f.__name__ and isinstance(self_parameter, ftype):
                         func = pfunc
                         break
                 else:
+                    if not isinstance(self_parameter, f.self_eclass):
+                        message = ("Your mapping expect a 'self' object with type:"
+                                   " {}, but got an object of type: {}".format(f.self_eclass, type(self_parameter)))
+                        raise RuntimeError(message)
                     func = f
             if func.inout:
                 index = func.__code__.co_varnames.index(self_var_name)
