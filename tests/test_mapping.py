@@ -44,6 +44,18 @@ def t2():
     return t, r1
 
 
+@pytest.fixture(scope='module')
+def t3():
+    # Define a transformation meta-data
+    t = m2m.Transformation('t3', inputs=['in_model'], outputs=['out_model'])
+
+    @t.mapping(when=lambda self: self.name.startswith('Spam'))
+    def r1(self: ecore.EClass) -> ecore.EPackage:
+        ...
+
+    return t, r1
+
+
 def test__mapping_signature(t1):
     t, r1, r2, r3 = t1
 
@@ -181,3 +193,28 @@ def test__mapping_rule_overloading(t2):
     assert isinstance(result1, ecore.EPackage)
     assert isinstance(result2, ecore.EClass)
     assert isinstance(result3, ecore.EDataType)
+
+
+def test__mapping_when(t3):
+    t, r1 = t3
+
+    # Fake main for the mapping execution
+    result1 = None
+    result2 = None
+    result3 = None
+    def fake_main(in_model, out_model):
+        nonlocal result1
+        nonlocal result2
+        nonlocal result3
+        result1 = r1(ecore.EClass('A'))  # output should be an nothing
+        param = ecore.EClass('SpamA')
+        result2 = r1(param)  # output should be an EPackage
+        result3 = r1(param)  # output should be the same as result2
+
+    t._main = fake_main
+
+    t.run(in_model=ecore.EPackage())
+    assert result1 is None
+    assert isinstance(result2, ecore.EPackage)
+    assert isinstance(result3, ecore.EPackage)
+    assert result2 is result3

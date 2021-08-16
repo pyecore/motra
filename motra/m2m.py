@@ -172,7 +172,7 @@ class Transformation(object):
                         break
                 else:
                     if not isinstance(self_parameter, f.self_eclass):
-                        return 
+                        return
                     func = f
             if func.inout:
                 result = self_parameter
@@ -233,10 +233,10 @@ class Transformation(object):
         cached_fun = functools.lru_cache()(inner)
         f.cache = cached_fun
         if when:
-            @functools.wraps(inner)
+            @functools.wraps(cached_fun)
             def when_inner(*args, **kwargs):
                 if when(*args, **kwargs):
-                    return inner(*args, **kwargs)
+                    return cached_fun(*args, **kwargs)
             when_inner.cache = cached_fun
             return when_inner
         return cached_fun
