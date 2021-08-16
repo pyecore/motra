@@ -245,6 +245,7 @@ class Transformation(object):
         if not f:
             return functools.partial(self.disjunct, mappings=mappings)
 
+        self.registered_mappings.append(f)
         @functools.wraps(f)
         def inner(*args, **kwargs):
             for fun in mappings:
@@ -253,7 +254,9 @@ class Transformation(object):
                     break
             f(*args, **kwargs)
             return result
-        return inner
+        cached_fun = functools.lru_cache()(inner)
+        f.cache = cached_fun
+        return cached_fun
 
 
 class TransformationExecution(object):
