@@ -52,6 +52,9 @@ class Parameters(object):
             return getattr(self, item)
         return getattr(self, self.parameter_names[item])
 
+    def __len__(self):
+        return len(self.parameter_names)
+
 
 class Transformation(object):
     def __init__(self, name, inputs, outputs):
@@ -69,6 +72,7 @@ class Transformation(object):
 
     def main(self, fun):
         self._main = fun
+        fun.__transformation__ = self
         return fun
 
     def run(self, clean_mappings_cache=True, resource_set=None, **kwargs):
@@ -114,6 +118,7 @@ class Transformation(object):
         if clean_mappings_cache:
             for mapping in self.registered_mappings:
                 mapping.cache.cache_clear()
+        del sp.f_globals["mycontext"]
         return context
 
     def _remember_package(self, eclass):
