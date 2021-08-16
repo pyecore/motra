@@ -72,6 +72,9 @@ class Transformation(object):
         return fun
 
     def run(self, clean_mappings_cache=True, resource_set=None, **kwargs):
+        if self._main is None:
+            raise RuntimeError("Your transformation doesn't have a main "
+                               "entry point")
         sp = inspect.currentframe()
         context = TransformationExecution(self, resource_set)
         sp.f_globals["mycontext"] = context
@@ -171,7 +174,11 @@ class Transformation(object):
 
             # Create object for the trace
             sp = inspect.currentframe()
-            context = sp.f_globals["mycontext"]
+            try:
+                context = sp.f_globals["mycontext"]
+            except KeyError:
+                raise RuntimeError("Mapping cannot be executed outside of the "
+                                   "the transformation.")
             try:
                 rule = context.trace[f.__name__]
             except Exception:
