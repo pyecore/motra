@@ -169,8 +169,7 @@ class Transformation(object):
                         raise RuntimeError(message)
                     func = f
             if func.inout:
-                index = func.__code__.co_varnames.index(self_var_name)
-                result = kwargs.get(self_var_name, args[index])
+                result = self_parameter
             elif func.result_eclass is Ecore.EClass:
                 result = func.result_eclass('')
             else:
