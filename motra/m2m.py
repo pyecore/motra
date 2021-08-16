@@ -172,9 +172,7 @@ class Transformation(object):
                         break
                 else:
                     if not isinstance(self_parameter, f.self_eclass):
-                        message = ("Your mapping expect a 'self' object with type:"
-                                   " {}, but got an object of type: {}".format(f.self_eclass, type(self_parameter)))
-                        raise RuntimeError(message)
+                        return 
                     func = f
             if func.inout:
                 result = self_parameter

@@ -3,21 +3,21 @@ import pyecore.ecore as ecore
 from motra import m2m
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def t1():
     # Define a transformation meta-data
     t = m2m.Transformation('t1', inputs=['in_model'], outputs=['out_model'])
     return t
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def t2():
     # Define a transformation meta-data
     t = m2m.Transformation('t2', inputs=['in_model', 'other_model'], outputs=['in_model', 'second_output'])
     return t
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def t3():
     # Define a transformation meta-data
     t = m2m.Transformation('t3', inputs=['in_model'], outputs=['out_model'])

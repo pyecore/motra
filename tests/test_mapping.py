@@ -4,7 +4,7 @@ import pyecore.ecore as ecore
 from motra import m2m
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def t1():
     # Define a transformation meta-data
     t = m2m.Transformation('t1', inputs=['in_model'], outputs=['out_model'])
@@ -24,7 +24,7 @@ def t1():
     return t, r1, r2, r3
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def t2():
     # Define a transformation meta-data
     t = m2m.Transformation('t2', inputs=['in_model'], outputs=['out_model'])
@@ -154,8 +154,10 @@ def test__mapping_bad_input(t1):
 
     t._main = fake_main
 
-    with pytest.raises(RuntimeError):
-        t.run(in_model=ecore.EPackage())
+    # No exception raise, but nothing created
+    r = t.run(in_model=ecore.EPackage())
+    assert result is None
+    assert len(r.outputs.out_model.contents) == 0
 
 
 def test__mapping_rule_overloading(t2):
