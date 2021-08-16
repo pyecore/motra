@@ -137,10 +137,10 @@ class Transformation(object):
             raise ValueError("Missing 'self' parameter for mapping: '{}'"
                              .format(f.__name__))
 
-        existing_mappings = (x.__name__ for x in self.registered_mappings)
-        if f.__name__ in existing_mappings:
+        existing_mapping = next((x for x in self.registered_mappings if f.__name__ == x.__name__), None)
+        if existing_mapping:
             self._polymorphic_calls[(f.__name__, f.self_eclass)] = f
-
+            self._polymorphic_calls[(existing_mapping.__name__, existing_mapping.self_eclass)] = existing_mapping
         self.registered_mappings.append(f)
         f.__mapping__ = True
         f.__transformation__ = self
@@ -153,8 +153,11 @@ class Transformation(object):
 
         @functools.wraps(f)
         def inner(*args, **kwargs):
-            index = f.__code__.co_varnames.index(self_var_name)
-            self_parameter = kwargs.get(self_var_name, args[index])
+            try:
+                index = f.__code__.co_varnames.index(self_var_name)
+                self_parameter = args[index]
+            except IndexError:
+                self_parameter = kwargs[self_var_name]
             try:
                 func = self._polymorphic_calls[(f.__name__, type(self_parameter))]
             except KeyError:

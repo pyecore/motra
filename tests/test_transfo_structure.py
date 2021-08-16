@@ -60,3 +60,13 @@ def test__metadata_one_rule(t3):
     assert t3.name == 't3'
     assert t3.metamodels == {ecore.eClass}
     assert len(t3.registered_mappings) == 1
+
+
+def test__mapping_need_self():
+    # Define a transformation meta-data
+    t = m2m.Transformation('t3', inputs=['in_model'], outputs=['out_model'])
+
+    with pytest.raises(ValueError):
+        @t.mapping
+        def r1(other: ecore.EClass):
+            ...
