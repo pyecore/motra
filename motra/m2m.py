@@ -226,7 +226,7 @@ class Transformation(object):
                 else:
                     g[result_var_name] = oldvalue
                 # result.listeners.remove(observer)
-                if func.output_def and \
+                if func.output_def and result.eResource is None and \
                         result not in context.outputs[func.output_def].contents:
                     context.outputs[func.output_def].append(result)
             return result
