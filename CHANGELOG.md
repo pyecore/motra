@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.0.3
+## 0.0.4
 
 * Fix issue with result being automatically moved to resource root.
 
@@ -10,4 +10,3 @@
   * `@mapping`, `@main`, `@disjunct`
   * polymorphic calls
   * cached results
-   
