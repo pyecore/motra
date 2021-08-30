@@ -24,7 +24,7 @@ setup(
     packages=packages,
     package_data={'': ['README.rst', 'LICENSE', 'CHANGELOG.rst']},
     include_package_data=True,
-    install_requires=['pyecore'],
+    install_requires=['pyecore', 'Mako'],
     tests_require=['pytest'],
     license='BSD 3-Clause',
     classifiers=[
