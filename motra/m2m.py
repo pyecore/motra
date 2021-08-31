@@ -142,10 +142,7 @@ class Transformation(object):
             raise ValueError("Missing 'self' parameter for mapping: '{}'"
                              .format(f.__name__))
 
-        existing_mapping = next((x for x in self.registered_mappings if f.__name__ == x.__name__), None)
-        if existing_mapping:
-            self._polymorphic_calls[(f.__name__, f.self_eclass)] = f
-            self._polymorphic_calls[(existing_mapping.__name__, existing_mapping.self_eclass)] = existing_mapping
+        self._polymorphic_calls.setdefault(f.__name__, []).append(f)
         self.registered_mappings.append(f)
         f.__mapping__ = True
         f.__transformation__ = self
@@ -163,17 +160,15 @@ class Transformation(object):
                 self_parameter = args[index]
             except IndexError:
                 self_parameter = kwargs[self_var_name]
-            try:
-                func = self._polymorphic_calls[(f.__name__, type(self_parameter))]
-            except KeyError:
-                for (fname, ftype), pfunc in self._polymorphic_calls.items():
-                    if fname == f.__name__ and isinstance(self_parameter, ftype):
-                        func = pfunc
+            candidates = self._polymorphic_calls[f.__name__]
+            for candidate in candidates:
+                if isinstance(self_parameter, candidate.self_eclass):
+                    if not candidate.when or candidate.when(*args, **kwargs):
+                        func = candidate
                         break
-                else:
-                    if not isinstance(self_parameter, f.self_eclass):
-                        return
-                    func = f
+            else:
+                return
+
             if func.inout:
                 result = self_parameter
             elif func.result_eclass is Ecore.EClass:
@@ -226,19 +221,13 @@ class Transformation(object):
                 else:
                     g[result_var_name] = oldvalue
                 # result.listeners.remove(observer)
-                if func.output_def and \
+                if func.output_def and result.eResource is None and \
                         result not in context.outputs[func.output_def].contents:
                     context.outputs[func.output_def].append(result)
             return result
         cached_fun = functools.lru_cache()(inner)
         f.cache = cached_fun
-        if when:
-            @functools.wraps(cached_fun)
-            def when_inner(*args, **kwargs):
-                if when(*args, **kwargs):
-                    return cached_fun(*args, **kwargs)
-            when_inner.cache = cached_fun
-            return when_inner
+        f.when = when
         return cached_fun
 
     def disjunct(self, f=None, mappings=None):
