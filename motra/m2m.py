@@ -163,10 +163,7 @@ class Transformation(object):
             candidates = self._polymorphic_calls[f.__name__]
             for candidate in candidates:
                 if isinstance(self_parameter, candidate.self_eclass):
-                    if not hasattr(candidate, 'when'):
-                        func = candidate
-                        break
-                    elif candidate.when(*args, **kwargs):
+                    if not candidate.when or candidate.when(*args, **kwargs):
                         func = candidate
                         break
             else:
@@ -230,8 +227,7 @@ class Transformation(object):
             return result
         cached_fun = functools.lru_cache()(inner)
         f.cache = cached_fun
-        if when:
-            f.when = when
+        f.when = when
         return cached_fun
 
     def disjunct(self, f=None, mappings=None):
