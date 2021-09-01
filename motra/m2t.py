@@ -5,7 +5,7 @@ from pathlib import Path
 from pyecore.utils import DynamicEPackage
 from pyecore.resources import ResourceSet, Resource, URI
 from mako.template import Template
-from mako.runtime import Context
+from mako.runtime import Context, Undefined
 
 
 def in_file(path, append, body):
@@ -109,7 +109,7 @@ class Transformation(object):
                         func = candidate
                         break
             else:
-                return
+                return Undefined
             # Create object for the context
             sp = inspect.currentframe()
             try:
