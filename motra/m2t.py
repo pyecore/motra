@@ -31,6 +31,7 @@ class Transformation(object):
         self.file_tag = file_tag
         self.full_template = self.file_tag
         self.metamodels = set()
+        self._polymorphic_calls = {}
 
     def run(self, model, resource_set=None):
         if isinstance(model, Resource):
@@ -42,8 +43,14 @@ class Transformation(object):
             resource = rset.get_resource(model)
             model = resource.contents[0]  # FIXME deal with mutliple root resources
         buf = StringIO()
-        myprops = {}
-        myprops['in_file'] = in_file
+        myprops = {'in_file': in_file}
+        for name, templates in self._polymorphic_calls.items():
+            myprops[name] = templates[0]
+        ctx = Context(buf,**myprops)
+
+        sp = inspect.currentframe()
+        sp.f_globals["mycontext"] = ctx
+
         for metamodel in self.metamodels:
             myprops[metamodel.name] = DynamicEPackage(metamodel)
         self.template = Template
@@ -53,12 +60,10 @@ class Transformation(object):
                 if isinstance(element, etype):
                     params = {pname: element}
                     template = Template(self.full_template)
-                    myprops['in_file'] = in_file
-                    ctx = Context(buf,**myprops)
                     template.get_def(fun.__name__).render_context(ctx, element)
                     result += buf.getvalue()
+        del sp.f_globals["mycontext"]
         return result
-
 
     def _register_template(self, f):
         def_template = """
@@ -76,11 +81,49 @@ class Transformation(object):
         self._register_template(f)
         return cached_fun
 
-    def template(self, f):
-        cached_fun = functools.lru_cache()(f)
+    def template(self, f=None, when=None):
+        if not f:
+            return functools.partial(self.template,
+                                     when=when)
+        f.when = when
+
+        @functools.wraps(f)
+        def inner(*args, **kwargs):
+            try:
+                var_name = f.__code__.co_varnames[0]
+                index = f.__code__.co_varnames.index(var_name)
+                self_parameter = args[index]
+            except IndexError:
+                self_parameter = kwargs[var_name]
+            candidates = self._polymorphic_calls[f.__name__]
+            for candidate in candidates:
+                candidate = candidate.__wrapped__.__wrapped__
+                parameter = next(iter(inspect.signature(candidate).parameters.values()))
+                if isinstance(self_parameter, parameter.annotation):
+                    # func = candidate
+                    # break
+                    if not candidate.when or candidate.when(*args, **kwargs):
+                        func = candidate
+                        break
+            else:
+                return
+            # Create object for the context
+            sp = inspect.currentframe()
+            try:
+                context = sp.f_globals["mycontext"]
+            except KeyError:
+                raise RuntimeError("Template cannot be executed outside of the "
+                                   "the transformation.")
+            func.template.get_def(func.__name__).render_context(context, *args, **kwargs)
+            return context._buffer_stack[0].getvalue().rstrip()
+        cached_fun = functools.lru_cache()(inner)
+        self._polymorphic_calls.setdefault(f.__name__,[]).append(cached_fun)
         if not f.__doc__:
             return cached_fun
+        def_template = """<%def name="{}({})">{}</%def>""".format(f.__name__, (', '.join(x for x in inspect.signature(f).parameters)), f.__doc__)
+        f.template = Template(def_template)
         parameter = next(iter(inspect.signature(f).parameters.values()))
+        f.f_parameter = parameter
         self.metamodels.add(parameter.annotation.eClass.ePackage)
-        self._register_template(f)
+        # self._register_template(f)
         return cached_fun

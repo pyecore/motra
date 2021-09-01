@@ -39,22 +39,42 @@ def eclass2class(self: ecore.EClass):
 <%motra:file path="examples/outputs/${self.ePackage.name}/${self.name}.java">
 public class ${self.name.capitalize()} {
     % for feature in self.eStructuralFeatures:
-    % if feature.many:
-    ${singlefeature(feature)}
-    % else:
-    ${singlefeature(feature)}
-    % endif
+    // ${override(feature)}
+    ${feature2attribute(feature)}
     % endfor
 }
 </%motra:file>
 """
 
+@ecore2simplejava.template(
+    when=lambda self: self.many
+)
+def feature2attribute(self: ecore.EAttribute):
+    """List<${self.eType.name}> ${self.name}; // many attribute"""
+
 
 @ecore2simplejava.template
-def singlefeature(self: ecore.EStructuralFeature):
-    """${self.eType.name} ${self.name};"""
+def feature2attribute(self: ecore.EAttribute):
+    """${self.eType.name} ${self.name}; // single attribute"""
+
+
+@ecore2simplejava.template(
+    when=lambda self: self.many
+)
+def feature2attribute(self: ecore.EReference):
+    """List<${self.eType.name}> ${self.name}; // many reference"""
 
 
 @ecore2simplejava.template
-def manyfeature(self: ecore.EStructuralFeature):
-    """List<${self.eType.name}> ${self.name};"""
+def feature2attribute(self: ecore.EReference):
+    """List<${self.eType.name}> ${self.name}; // single reference"""
+
+
+@ecore2simplejava.template
+def override(self: ecore.EAttribute):
+    """Attribut ${self.name}: ${self.eType.name} [${self.lowerBound}..${self.upperBound}]"""
+
+
+@ecore2simplejava.template
+def override(self: ecore.EReference):
+    """Reference ${self.name}: ${self.eType.name} [${self.lowerBound}..${self.upperBound}]"""
