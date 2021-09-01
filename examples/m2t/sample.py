@@ -2,7 +2,9 @@ from motra import m2t
 import pyecore.ecore as ecore
 
 
+#
 # A simple ecore to dot to see hierarchie (no other stuff)
+#
 ecore2dot = m2t.Transformation("ecore2dot")
 
 
@@ -28,9 +30,10 @@ Digraph metamodel_${self.name} {
 def eclass2node(self: ecore.EClass, stype: ecore.EClass):
     """${self.name} -> ${stype.name};"""
 
-
+#
 # A simple ecore 2 java-like language.
 # This demonstrate the use of various tag to produce many files and file hierarchies
+#
 ecore2simplejava = m2t.Transformation("ecore2simplejava")
 
 @ecore2simplejava.main

@@ -46,13 +46,13 @@ class Transformation(object):
         myprops = {'in_file': in_file}
         for name, templates in self._polymorphic_calls.items():
             myprops[name] = templates[0]
-        ctx = Context(buf,**myprops)
+        for metamodel in self.metamodels:
+            myprops[metamodel.name] = DynamicEPackage(metamodel)
 
+        ctx = Context(buf,**myprops)
         sp = inspect.currentframe()
         sp.f_globals["mycontext"] = ctx
 
-        for metamodel in self.metamodels:
-            myprops[metamodel.name] = DynamicEPackage(metamodel)
         self.template = Template
         result = ""
         for element in (model, *model.eAllContents()):
