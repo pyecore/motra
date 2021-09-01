@@ -75,9 +75,14 @@ def feature2attribute(self: ecore.EReference):
 
 @ecore2simplejava.template
 def override(self: ecore.EAttribute):
-    """Attribut ${self.name}: ${self.eType.name} [${self.lowerBound}..${self.upperBound}]"""
+    """Attribut ${self.name}: ${self.eType.name} [${self.lowerBound}..${upper2symbol(self)}]"""
 
 
 @ecore2simplejava.template
 def override(self: ecore.EReference):
-    """Reference ${self.name}: ${self.eType.name} [${self.lowerBound}..${self.upperBound}]"""
+    """Reference ${self.name}: ${self.eType.name} [${self.lowerBound}..${upper2symbol(self)}]"""
+
+
+@ecore2simplejava.helper
+def upper2symbol(self: ecore.EStructuralFeature):
+    return '*' if self.many else self.upperBound

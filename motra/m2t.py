@@ -32,6 +32,7 @@ class Transformation(object):
         self.full_template = self.file_tag
         self.metamodels = set()
         self._polymorphic_calls = {}
+        self.helpers = []
 
     def run(self, model, resource_set=None):
         if isinstance(model, Resource):
@@ -44,6 +45,8 @@ class Transformation(object):
             model = resource.contents[0]  # FIXME deal with mutliple root resources
         buf = StringIO()
         myprops = {'in_file': in_file}
+        for f in self.helpers:
+            myprops[f.__name__] = f
         for name, templates in self._polymorphic_calls.items():
             myprops[name] = templates[0]
         for metamodel in self.metamodels:
@@ -125,5 +128,7 @@ class Transformation(object):
         parameter = next(iter(inspect.signature(f).parameters.values()))
         f.f_parameter = parameter
         self.metamodels.add(parameter.annotation.eClass.ePackage)
-        # self._register_template(f)
         return cached_fun
+
+    def helper(self, f):
+        self.helpers.append(f)
