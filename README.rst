@@ -99,6 +99,7 @@ As for M2M, a M2T transformation must be defined in it's own Python module (even
 Each template code is written as ``__doc__`` of template functions.
 
 .. code-block:: python
+
     from motra import m2t
     import pyecore.ecore as ecore
 
