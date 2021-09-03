@@ -11,7 +11,8 @@ ecore2dot = m2t.Transformation("ecore2dot")
 @ecore2dot.main
 def package2graph(self: ecore.EPackage):
     """
-<%motra:file path="examples/outputs/${self.name}.dot">
+Generate dot file: "examples/outputs/${self.name}.dot"
+<%motra:file path="examples/outputs/${self.name}.dot"> \\
 Digraph metamodel_${self.name} {
     % for eclass in self.eClassifiers:
         ${eclass.name};
@@ -19,9 +20,20 @@ Digraph metamodel_${self.name} {
             %for stype in eclass.eSuperTypes:
         ${eclass2node(eclass, stype)}
             %endfor
+            %for ref in eclass.eReferences:
+        ${ereference2link(ref)}
+            %endfor
         % endif
     % endfor
 }
+</%motra:file>
+
+Generate Makefile: "examples/outputs/Makefile"
+<%motra:file path="examples/outputs/Makefile"> \\
+all: ${self.name}.png
+
+${self.name}.png: ${self.name}.dot
+\tdot -Tpng -o $@ $<
 </%motra:file>
 """
 
@@ -29,6 +41,11 @@ Digraph metamodel_${self.name} {
 @ecore2dot.template
 def eclass2node(self: ecore.EClass, stype: ecore.EClass):
     """${self.name} -> ${stype.name};"""
+
+
+@ecore2dot.template
+def ereference2link(self: ecore.EReference):
+    """${self.eContainer().name} -> ${self.eType.name}"""
 
 #
 # A simple ecore 2 java-like language.
