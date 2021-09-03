@@ -1,4 +1,5 @@
-from pyecore.resources import ResourceSet
+from pyecore.resources import ResourceSet, Resource
+from pyecore.ecore import EObject
 """Mixins to be implemented by user."""
 
 
@@ -12,7 +13,7 @@ class ChainMixin:
         parameter = input
         self.resource_set = ResourceSet()
         for operation in self.operations:
-            parameter = operation.execute(parameter)
+            parameter = operation.execute(operation.prepare_execution(parameter))
         del self.resource_set
         return parameter
 
@@ -22,6 +23,20 @@ class OperationMixin:
 
     def __init__(self, *, chain=None, **kwargs):
         super().__init__()
+
+    def prepare_execution(self, param):
+        if isinstance(param, Resource):
+            return param
+        rset = self.chain.resource_set
+        if isinstance(param, str):
+            resource = rset.get_resource(resource)
+        if isinstance(param, EObject):
+            if param.eResource:
+                resource = param.eResource
+            else:
+                resource = rset.create_resource(f"tmp_{id(param)}")
+                resource.append(param)
+        return resource
 
     def execute(self, model=None):
 
@@ -102,7 +117,10 @@ class M2TMixin:
     def execute(self, resource):
         try:
             rset = self.chain.resource_set
-            self.implementation.run(resource)
+            result = self.implementation.run(resource)
+            result = result.rstrip()
+            if result:
+                print(result)
             return resource
         except AttributeError as e:
             raise RuntimeError("The transformation has to be launched from a chain")

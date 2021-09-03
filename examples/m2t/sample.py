@@ -70,7 +70,7 @@ def feature2attribute(self: ecore.EReference):
 
 @ecore2simplejava.template
 def feature2attribute(self: ecore.EReference):
-    """List<${self.eType.name}> ${self.name}; // single reference"""
+    """${self.eType.name} ${self.name}; // single reference"""
 
 
 @ecore2simplejava.template

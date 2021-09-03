@@ -126,7 +126,6 @@ class M2M(_user_module.M2MMixin, Transformation):
         super().__init__(**kwargs)
 
 
-@abstract
 class M2T(_user_module.M2TMixin, Transformation):
 
     def __init__(self, **kwargs):

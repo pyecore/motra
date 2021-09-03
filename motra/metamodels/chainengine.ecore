@@ -76,7 +76,7 @@
       <details xmi:id="_018EYO5jEDmYn7vIl8XWxw00" key="uuid" value="_018EYO5jEDmYn7vIl8XWxw"/>
     </eAnnotations>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" xmi:id="_1Vo4IO5jEDmYn7vIl8XWxw" name="M2T" abstract="true" eSuperTypes="_zvMewO5jEDmYn7vIl8XWxw">
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_1Vo4IO5jEDmYn7vIl8XWxw" name="M2T" eSuperTypes="_zvMewO5jEDmYn7vIl8XWxw">
     <eAnnotations xmi:id="_1Vo4IO5jEDmYn7vIl8XWxw0" source="genmymodel">
       <details xmi:id="_1Vo4IO5jEDmYn7vIl8XWxw00" key="uuid" value="_1Vo4IO5jEDmYn7vIl8XWxw"/>
     </eAnnotations>

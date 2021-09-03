@@ -36,7 +36,7 @@ class Transformation(object):
 
     def run(self, model, resource_set=None):
         if isinstance(model, Resource):
-            model = resource.contents[0]  # FIXME deal with mutliple root resources
+            model = model.contents[0]  # FIXME deal with mutliple root resources
         elif isinstance(model, (str, URI)):
             rset = resource_set if resource_set else ResourceSet()
             for metamodel in self.metamodels:
@@ -57,16 +57,14 @@ class Transformation(object):
         sp.f_globals["mycontext"] = ctx
 
         self.template = Template
-        result = ""
         for element in (model, *model.eAllContents()):
             for (fun, pname, etype), template in self.mains:
                 if isinstance(element, etype):
                     params = {pname: element}
                     template = Template(self.full_template)
                     template.get_def(fun.__name__).render_context(ctx, element)
-                    result += buf.getvalue()
         del sp.f_globals["mycontext"]
-        return result
+        return buf.getvalue()
 
     def _register_template(self, f):
         def_template = """
@@ -113,12 +111,16 @@ class Transformation(object):
             # Create object for the context
             sp = inspect.currentframe()
             try:
-                context = sp.f_globals["mycontext"]
+                ctx = sp.f_globals["mycontext"]
             except KeyError:
                 raise RuntimeError("Template cannot be executed outside of the "
                                    "the transformation.")
-            func.template.get_def(func.__name__).render_context(context, *args, **kwargs)
-            return context._buffer_stack[0].getvalue().rstrip()
+            old_io = ctx._buffer_stack[0]
+            buf = StringIO()
+            ctx._buffer_stack[0] = buf
+            func.template.get_def(func.__name__).render_context(ctx, *args, **kwargs)
+            ctx._buffer_stack[0] = old_io
+            return buf.getvalue()
         cached_fun = functools.lru_cache()(inner)
         self._polymorphic_calls.setdefault(f.__name__,[]).append(cached_fun)
         if not f.__doc__:
