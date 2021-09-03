@@ -29,7 +29,7 @@ class OperationMixin:
             return param
         rset = self.chain.resource_set
         if isinstance(param, str):
-            resource = rset.get_resource(resource)
+            resource = rset.get_resource(param)
         if isinstance(param, EObject):
             if param.eResource:
                 resource = param.eResource

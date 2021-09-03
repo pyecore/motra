@@ -24,6 +24,10 @@ class ChainEngine(object):
         self.chain.operations.append(interactive)
         return self
 
+    def repl(self):
+        self.chain.operations.append(modelrepl)
+        return self
+
     def run(self, model):
         return self.chain.run(model)
 
@@ -89,3 +93,6 @@ class ModelREPL(Interactive):
         shell.vars['self'] = resource.contents[0]
         shell.cmdloop()
         return resource
+
+
+modelrepl = ModelREPL()
