@@ -17,7 +17,8 @@ Here are some characteristics about Motra M2M:
 Documentation
 =============
 
-WIP, at the moment, please refer to transformations examples in ``examples``.
+Documentation is still a WIP and can be found here: `https://motra.readthedocs.io/`_.
+For more examples, please refer to transformations examples in ``examples``.
 To avoid the need to load/install special metamodels, all the transformations examples are given directly over Ecore.
 The transformations are gathered in simple modules depending to their characteristics: in-place, in-out, endogenous or exogenous.
 
