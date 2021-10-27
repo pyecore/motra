@@ -1,7 +1,8 @@
 import cmd
 import pyecore
 from pyecore.resources import ResourceSet, Resource
-from .chainengine import M2M, M2T, Chain, Save, Interactive
+from .chainengine import M2M, M2T, Chain, Save, Interactive, Transformation
+# from . import m2t
 
 
 class ChainEngine(object):
@@ -96,3 +97,66 @@ class ModelREPL(Interactive):
 
 
 modelrepl = ModelREPL()
+
+
+# chain_printer = m2t.Transformation('chain_printer')
+#
+#
+# @chain_printer.main
+# def main(self: Chain):
+#     """
+# Generate dot file: "${output_path}/${self.name}.dot"
+# <%motra:file path="${output_path}/${self.name}.dot"> \\
+# Digraph ${self.name} {
+#     rankdir=LR
+#     % for operation in self.operations:
+#     ${shape_config(operation)}
+#     % endfor
+#     % for operation in self.operations:
+#     ${gen_name(operation)} \\
+#     % if loop.index != len(self.operations) - 1:
+#  -> \\
+#     % endif
+#     % endfor
+#
+# }
+# </%motra:file>
+#     """
+#
+# @chain_printer.template
+# def shape_config(self: Transformation):
+#     """${self.implementation.name} [shape=circle]"""
+#
+#
+# @chain_printer.template
+# def shape_config(self: Save):
+#     """ "${self.path}" [shape=note]"""
+#
+#
+# @chain_printer.template
+# def shape_config(self: Interactive):
+#     """${self.__class__.__name__} [shape=tab]"""
+#
+#
+# @chain_printer.template
+# def gen_name(self: Transformation):
+#     """${self.implementation.name}"""
+#
+#
+# @chain_printer.template
+# def gen_name(self: Save):
+#     """ "${self.path}" """
+#
+#
+# @chain_printer.template
+# def gen_name(self: Interactive):
+#     """${self.__class__.__name__}"""
+# # digraph G {
+# #     rankdir=LR
+# #     node [margin=0 fontcolor=blue fontsize=32 width=0.5 shape=note style=filled]
+# #     inter [shape=rect width=0.1 label="" color=black]
+# #
+# #   a -> b
+# #   b -> c
+# #   b -> d
+# # }
