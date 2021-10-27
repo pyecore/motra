@@ -124,10 +124,12 @@ class Transformation(object):
     def _remember_package(self, eclass):
         if eclass is None:
             return
-        if isinstance(eclass, type):
+        if hasattr(eclass, '_staticEClass'):
             package = eclass.eClass.ePackage
-        else:
+        elif isinstance(eclass, Ecore.EObject):
             package = eclass.ePackage
+        else:
+            return
         self.metamodels.add(package)
 
     def mapping(self, f=None, output_model=None, when=None):
@@ -221,7 +223,7 @@ class Transformation(object):
                 else:
                     g[result_var_name] = oldvalue
                 # result.listeners.remove(observer)
-                if func.output_def and result.eResource is None and \
+                if func.output_def and getattr(result, 'eResource', False) is None and \
                         result not in context.outputs[func.output_def].contents:
                     context.outputs[func.output_def].append(result)
             return result
