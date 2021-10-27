@@ -2,6 +2,7 @@ import inspect
 import functools
 from io import StringIO
 from pathlib import Path
+import pyecore.ecore as Ecore
 from pyecore.utils import DynamicEPackage
 from pyecore.resources import ResourceSet, Resource, URI
 from mako.template import Template
@@ -79,7 +80,11 @@ class Transformation(object):
             return cached_fun
         parameter = next(iter(inspect.signature(f).parameters.values()))
         self.mains.append(((f, parameter.name, parameter.annotation), cached_fun))
-        self.metamodels.add(parameter.annotation.eClass.ePackage)
+        ec = parameter.annotation
+        if hasattr(ec, '_staticEClass'):
+            self.metamodels.add(parameter.annotation.eClass.ePackage)
+        elif isinstance(ec, Ecore.EObject):
+            self.metamodels.add(eclass.ePackage)
         self._register_template(f)
         return cached_fun
 
