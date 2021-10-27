@@ -147,6 +147,7 @@ class Transformation(object):
         self._polymorphic_calls.setdefault(f.__name__, []).append(f)
         self.registered_mappings.append(f)
         f.__mapping__ = True
+        f.__disjunct__ = False
         f.__transformation__ = self
         self._remember_package(f.self_eclass)
         f.result_eclass = typing.get_type_hints(f).get('return')
@@ -236,6 +237,9 @@ class Transformation(object):
         if not f:
             return functools.partial(self.disjunct, mappings=mappings)
 
+        f.__mapping__ = False
+        f.__disjunct__ = True
+        f.__transformation__ = self
         self.registered_mappings.append(f)
         @functools.wraps(f)
         def inner(*args, **kwargs):
@@ -247,6 +251,7 @@ class Transformation(object):
             return result
         cached_fun = functools.lru_cache()(inner)
         f.cache = cached_fun
+        f.mappings = mappings
         return cached_fun
 
 
