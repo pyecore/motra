@@ -34,7 +34,7 @@ class Transformation(object):
         self._polymorphic_calls = {}
         self.helpers = []
 
-    def run(self, model, resource_set=None):
+    def run(self, model, resource_set=None, **kwargs):
         if isinstance(model, Resource):
             model = model.contents[0]  # FIXME deal with mutliple root resources
         elif isinstance(model, (str, URI)):
@@ -45,6 +45,7 @@ class Transformation(object):
             model = resource.contents[0]  # FIXME deal with mutliple root resources
         buf = StringIO()
         myprops = {'in_file': in_file}
+        myprops.update(**kwargs)
         for f in self.helpers:
             myprops[f.__name__] = f
         for name, templates in self._polymorphic_calls.items():
