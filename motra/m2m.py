@@ -185,19 +185,19 @@ class Transformation(object):
             except KeyError:
                 raise RuntimeError("Mapping cannot be executed outside of the "
                                    "the transformation.")
-            try:
-                rule = context.trace[f.__name__]
-            except Exception:
-                rule = trace.Rule(name=f.__name__)
-            context.trace.rules.append(rule)
-            record = trace.Record()
-            for element in args:
-                if isinstance(element, Ecore.EObject):
-                    record.inputs.append(trace.ObjectReference(old_value=element))
-                else:
-                    record.inputs.append(trace.Attribute(old_value=element))
-            record.outputs.append(trace.ObjectReference(old_value=result))
-            rule.records.append(record)
+            # try:
+            #     rule = context.trace[f.__name__]
+            # except Exception:
+            #     rule = trace.Rule(name=f.__name__)
+            # context.trace.rules.append(rule)
+            # record = trace.Record()
+            # for element in args:
+            #     if isinstance(element, Ecore.EObject):
+            #         record.inputs.append(trace.ObjectReference(old_value=element))
+            #     else:
+            #         record.inputs.append(trace.Attribute(old_value=element))
+            # record.outputs.append(trace.ObjectReference(old_value=result))
+            # rule.records.append(record)
 
             # Inject new parameter
             g = func.__globals__
